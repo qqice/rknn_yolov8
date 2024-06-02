@@ -58,7 +58,7 @@ std::unique_ptr<cv::Mat> ImageProcess::Convert(const cv::Mat &src) {
   cv::Point position(padding_x_ / 2, padding_y_ / 2);
   resize_img.copyTo((*square_img)(
       cv::Rect(position.x, position.y, resize_img.cols, resize_img.rows)));
-  return std::move(square_img);
+  return square_img;
 }
 
 const letterbox_t &ImageProcess::get_letter_box() { return letterbox_; }

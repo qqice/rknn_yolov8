@@ -10,11 +10,11 @@
 #include "yolov8.h"
 class RknnPool {
  public:
-  RknnPool(const std::string model_path, const int thread_num,
-           const std::string label_path);
+  RknnPool(const std::string& model_path, const int thread_num,
+           const std::string& label_path);
   ~RknnPool();
   void Init();
-  void DeInit();
+  static void DeInit();
   void AddInferenceTask(std::shared_ptr<cv::Mat> src,
                         ImageProcess &image_process);
   int get_model_id();

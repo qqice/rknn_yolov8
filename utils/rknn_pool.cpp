@@ -7,8 +7,8 @@
 #include "spdlog/spdlog.h"
 #include "postprocess.h"
 
-RknnPool::RknnPool(const std::string model_path, const int thread_num,
-                   const std::string lable_path) {
+RknnPool::RknnPool(const std::string& model_path, const int thread_num,
+                   const std::string& lable_path) {
   this->thread_num_ = thread_num;
   this->model_path_ = model_path;
   this->label_path_ = lable_path;
@@ -78,7 +78,7 @@ std::shared_ptr<cv::Mat> RknnPool::GetImageResultFromQueue() {
   } else {
     auto res = this->image_results_.front();
     this->image_results_.pop();
-    return std::move(res);
+    return res;
   }
 }
 
