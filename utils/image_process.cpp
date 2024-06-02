@@ -185,26 +185,40 @@ void ImageProcess::ProcessTrackImage(cv::Mat &image,
 
 void ImageProcess::ProcessDetectionImage(
     cv::Mat &image, object_detect_result_list &od_results) const {
+  std::unordered_map<int, cv::Scalar> class_colors;
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  std::uniform_int_distribution<int> dis(100, 255);
+
   for (int i = 0; i < od_results.count; ++i) {
-    object_detect_result *detect_result = &(od_results.results[i]);
-    //    if (strcmp(coco_cls_to_name(detect_result->cls_id), "person") == 0){
-    //    continue;}
-      spdlog::info("{} @ ({} {} {} {}) {}",
-                       coco_cls_to_name(detect_result->cls_id),
-                       detect_result->box.left, detect_result->box.top,
-                       detect_result->box.right, detect_result->box.bottom,
-                       detect_result->prop);
-    cv::rectangle(
-        image, cv::Point(detect_result->box.left, detect_result->box.top),
-        cv::Point(detect_result->box.right, detect_result->box.bottom),
-        cv::Scalar(0, 0, 255), 2);
-    char text[256];
-    sprintf(text, "%s %.1f%%", coco_cls_to_name(detect_result->cls_id),
-            detect_result->prop * 100);
-    cv::putText(image, text,
-                cv::Point(detect_result->box.left, detect_result->box.top + 20),
-                cv::FONT_HERSHEY_COMPLEX, 1, cv::Scalar(255, 0, 0), 2,
-                cv::LINE_8);
+      object_detect_result *detect_result = &(od_results.results[i]);
+      spdlog::debug("{} @ ({} {} {} {}) {}",
+                   coco_cls_to_name(detect_result->cls_id),
+                   detect_result->box.left, detect_result->box.top,
+                   detect_result->box.right, detect_result->box.bottom,
+                   detect_result->prop);
+
+      cv::Scalar color;
+      if (class_colors.count(detect_result->cls_id) == 0) {
+          color = cv::Scalar(dis(gen), dis(gen), dis(gen));
+          class_colors[detect_result->cls_id] = color;
+      } else {
+          color = class_colors[detect_result->cls_id];
+      }
+
+      cv::rectangle(
+              image, cv::Point(detect_result->box.left, detect_result->box.top),
+              cv::Point(detect_result->box.right, detect_result->box.bottom),
+              color, 2);
+      std::string classString =
+              &coco_cls_to_name(detect_result->cls_id)[' '] + std::to_string(detect_result->prop).substr(0, 4);
+      spdlog::info("classString is {}", classString);
+      cv::Size textSize = cv::getTextSize(classString, cv::FONT_HERSHEY_DUPLEX, 1, 2, 0);
+      cv::Rect textBox(detect_result->box.left, detect_result->box.top - 40, textSize.width + 10, textSize.height + 20);
+
+      cv::rectangle(image, textBox, color, cv::FILLED);
+      cv::putText(image, classString, cv::Point(detect_result->box.left + 5, detect_result->box.top - 10),
+                  cv::FONT_HERSHEY_DUPLEX, 1, cv::Scalar(0, 0, 0), 2, 0);
   }
 }
 

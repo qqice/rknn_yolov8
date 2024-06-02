@@ -7,6 +7,7 @@
 #include "mutex"
 #include "opencv2/opencv.hpp"
 #include "postprocess.h"
+#include <random>
 
 class ImageProcess {
  public:
